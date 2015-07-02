@@ -1,0 +1,23 @@
+{
+    "Timestamp": "2015-06-06T15:21:58-05:00",
+    "Contents": [
+    {
+      "Key": "testFiles/f8.txt",
+      "LastModified": "2015-06-04T01:19:56-05:00",
+      "Size": 3,
+      "VersionID": "dI7zOyMWy_1F8.17kBRfA9Z4GEtOtyci"
+    },
+    {
+      "Key": "testFiles/f9.txt",
+      "LastModified": "2015-06-04T01:19:57-05:00",
+      "Size": 3,
+      "VersionID": "w0HGEGZxOwgru5sU_MABm0GUK7uCggXZ"
+    },
+    {
+      "Key": "testFiles/f10.txt",
+      "LastModified": "2015-06-04T01:19:58-05:00",
+      "Size": 3,
+      "VersionID": "dI7zOyMWy_1F8.17kBblablablablaba"
+    }
+  ]
+}

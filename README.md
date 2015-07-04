@@ -1,6 +1,6 @@
 # backup-my-bucket
 
-backup-my-bucket is a command line application that complements
+`backup-my-bucket` is a command line application that complements
 cross-region replication and versioning to form a backup and restore
 system for S3 buckets. For a given master bucket, the system covers
 the following use cases.
@@ -8,6 +8,10 @@ the following use cases.
 1. Create restoration points.
 2. Restore the contents of master to a restoration point.
 3. Remove obsolete restoration points.
+
+For a more complete explanation of `backup-my-bucket`, read the corresponding
+[blog
+post](http://backstage.segundamano.mx/blog/2015/07/02/backup-your-s3-bucket/).
 
 A restoration point is a copy of the contents of master at a given
 point in time. The system creates restoration points by copying the

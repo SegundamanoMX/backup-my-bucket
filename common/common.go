@@ -22,6 +22,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/defaults"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/SegundamanoMX/backup-my-bucket/log"
 	"io/ioutil"
@@ -45,7 +46,7 @@ type BackupSet struct {
 
 type AppConfig struct {
 	LogLevel             int
-	AwsLogLevel          int
+	AwsLogLevel          aws.LogLevelType
 	Syslog               bool
 	BackupSet            BackupSet
 }
@@ -54,7 +55,7 @@ type Version struct {
 	Key                  string
 	LastModified         time.Time
 	Size                 int64
-	VersionID            string
+	VersionId            string
 }
 
 type Snapshot struct {
@@ -124,9 +125,22 @@ func LoadSnapshot(file string) (snapshot Snapshot) {
 }
 
 func ConfigureAws(region string) {
-	aws.DefaultConfig.Credentials = credentials.NewStaticCredentials(Cfg.BackupSet.AccessKey, Cfg.BackupSet.SecretKey, "")
-	aws.DefaultConfig.Region = region
-	aws.DefaultConfig.LogLevel = uint(Cfg.AwsLogLevel)
+	logLevelType := func(logLevel uint) aws.LogLevelType {
+		var awsLogLevel aws.LogLevelType
+		switch logLevel {
+		case 0: awsLogLevel = aws.LogOff
+		case 1: awsLogLevel = aws.LogDebug
+		case 2: awsLogLevel = aws.LogDebugWithSigning
+		case 3: awsLogLevel = aws.LogDebugWithHTTPBody
+		case 4: awsLogLevel = aws.LogDebugWithRequestRetries
+		case 5: awsLogLevel = aws.LogDebugWithRequestErrors
+		}
+		return awsLogLevel
+	}
+
+	defaults.DefaultConfig.Credentials = credentials.NewStaticCredentials(Cfg.BackupSet.AccessKey, Cfg.BackupSet.SecretKey, "")
+	defaults.DefaultConfig.Region = &region
+	defaults.DefaultConfig.LogLevel = aws.LogLevel(logLevelType(uint(Cfg.AwsLogLevel)))
 }
 
 func Min(x int, y int) int {

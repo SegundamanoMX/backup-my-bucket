@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/SegundamanoMX/backup-my-bucket/common"
 	"github.com/SegundamanoMX/backup-my-bucket/log"
@@ -132,9 +131,9 @@ func snapshotWorker(wid int, path string) {
 		Delimiter:       aws.String("/"),
 		// EncodingType:    aws.String("EncodingType"),
 		// KeyMarker:       aws.String("KeyMarker"),
-		MaxKeys:         aws.Long(common.SnapshotBatchSize),
+		MaxKeys:         aws.Int64(common.SnapshotBatchSize),
 		Prefix:          aws.String(path),
-		// VersionIDMarker: aws.String("VersionIdMarker"),
+		// VersionIdMarker: aws.String("VersionIdMarker"),
 	}
 	var discoveredVersions []common.Version
 	buffer := make([]common.Version, common.SnapshotBatchSize)
@@ -172,12 +171,12 @@ func snapshotWorker(wid int, path string) {
 				if v.Key == nil { log.Fatal("[%d] Key is nil", wid) }
 				if v.LastModified == nil { log.Fatal("[%d] LastModified is nil", wid) }
 				if v.Size == nil { log.Fatal("[%d] Size is nil", wid) }
-				if v.VersionID == nil { log.Fatal("[%d] VersionID is nil", wid) }
+				if v.VersionId == nil { log.Fatal("[%d] VersionId is nil", wid) }
 				version := common.Version{
 					Key: *v.Key,
 					LastModified: *v.LastModified,
 					Size: *v.Size,
-					VersionID: *v.VersionID,
+					VersionId: *v.VersionId,
 				}
 				log.Debug("[%d] Discover latest version: %s", wid, version)
 				buffer[index] = version
@@ -191,17 +190,17 @@ func snapshotWorker(wid int, path string) {
 		if ! *resp.IsTruncated { break }
 		log.Info("[%d] Continue exploring path '%s'.", wid, path)
 
-		if resp.NextVersionIDMarker != nil {
-			log.Debug("[%d] NextVersionIDMarker = %s", wid, awsutil.StringValue(resp.NextVersionIDMarker))
+		if resp.NextVersionIdMarker != nil {
+			log.Debug("[%d] NextVersionIdMarker = %+v", wid, resp.NextVersionIdMarker)
 		} else {
-			log.Debug("[%d] NextVersionIDMarker = nil", wid)
+			log.Debug("[%d] NextVersionIdMarker = nil", wid)
 		}
 		if resp.NextKeyMarker != nil {
-			log.Debug("[%d] NextKeyMarker = %s", wid, awsutil.StringValue(resp.NextKeyMarker))
+			log.Debug("[%d] NextKeyMarker = %+v", wid, resp.NextKeyMarker)
 		} else {
 			log.Debug("[%d] NextKeyMarker = nil", wid)
 		}
-		params.VersionIDMarker = resp.NextVersionIDMarker
+		params.VersionIdMarker = resp.NextVersionIdMarker
 		params.KeyMarker = resp.NextKeyMarker
 	}
 

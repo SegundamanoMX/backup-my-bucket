@@ -101,7 +101,7 @@ func downloadWorker() {
 			// SSECustomerAlgorithm:       aws.String("SSECustomerAlgorithm"),
 			// SSECustomerKey:             aws.String("SSECustomerKey"),
 			// SSECustomerKeyMD5:          aws.String("SSECustomerKeyMD5"),
-			VersionID:                  aws.String(work.Version.VersionID),
+			VersionId:                  aws.String(work.Version.VersionId),
 		}
 		getResp, getErr := s3Client.GetObject(getParams)
 		if getErr != nil {

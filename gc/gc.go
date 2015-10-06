@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/awsutil"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/SegundamanoMX/backup-my-bucket/common"
 	"github.com/SegundamanoMX/backup-my-bucket/log"
@@ -71,17 +70,17 @@ func discriminateVersions(oldSnapshots []common.Snapshot, recentSnapshots []comm
 				pretty, _ := json.MarshalIndent(recentVersion, "", "    ")
 				log.Debug("Version is recent: %s", pretty)
 			}
-			recentId[recentVersion.VersionID] = true;
+			recentId[recentVersion.VersionId] = true;
 		}
 	}	
 
 	for _, oldS := range oldSnapshots {
 		log.Debug("Discriminating versions for old Snapshot '%s' on %s.", oldS.File, oldS.Timestamp)
 		for _, oldVersion := range oldS.Contents {
-			if _, ok := recentId[oldVersion.VersionID]; ok {
+			if _, ok := recentId[oldVersion.VersionId]; ok {
 				continue
 			}
-			recentId[oldVersion.VersionID] = false
+			recentId[oldVersion.VersionId] = false
 			if common.Cfg.LogLevel > log.DEBUG {
 				pretty, _ := json.MarshalIndent(oldVersion, "", "    ")
 				log.Debug("Will remove version: %s", pretty)
@@ -104,11 +103,11 @@ func removeVersions(versionsToRemove []common.Version) (ok bool) {
 			Bucket: aws.String(common.Cfg.BackupSet.SlaveBucket),
 			Delete: &s3.Delete{
 				Objects: objects,
-				Quiet: aws.Boolean(true),
+				Quiet: aws.Bool(true),
 			},
 		}
 
-		log.Debug("params[%d] = %s", batch, awsutil.StringValue(params))
+		log.Debug("params[%d] = %+v", batch, *params)
 		resp, err := s3Client.DeleteObjects(params)
 
 		if err != nil {
@@ -133,7 +132,7 @@ func removeVersions(versionsToRemove []common.Version) (ok bool) {
 			}
 		}
 
-		log.Debug("response[%d] = %s", batch, awsutil.StringValue(resp))
+		log.Debug("response[%d] = %+v", batch, *resp)
 	}
 	return true
 }
@@ -154,10 +153,10 @@ func makeObjectBatches(versions []common.Version) (objectBatches [][]*s3.ObjectI
 		}
 		object := &s3.ObjectIdentifier{
 			Key:       aws.String(version.Key),
-			VersionID: aws.String(version.VersionID),
+			VersionId: aws.String(version.VersionId),
 		}
 		objectBatches[batch][index - common.GcBatchSize * batch] = object
-		log.Debug("Batch %d = %s", batch, awsutil.StringValue(objectBatches[batch]))
+		log.Debug("Batch %d = %+v", batch, objectBatches[batch])
 	}
 
 	return

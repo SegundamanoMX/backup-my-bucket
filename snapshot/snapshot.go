@@ -44,7 +44,6 @@ func Snapshot() {
 
 	timestamp := time.Now()
 	timestampStr := timestamp.Format("20060102150405-0700MST")
-	log.Info("Taking snapshot %s of bucket %s.", timestamp, common.Cfg.BackupSet.SlaveBucket)
 	log.Info("Taking snapshot %s of bucket %s.", timestampStr, common.Cfg.BackupSet.SlaveBucket)
 	
 	common.ConfigureAws(common.Cfg.BackupSet.SlaveRegion)
@@ -61,7 +60,7 @@ func Snapshot() {
 
 	log.Info("Dumping snapshot to %s%s.", common.Cfg.BackupSet.SnapshotsDir, timestampStr)
 	snapshot := &common.Snapshot{
-		File: common.Cfg.BackupSet.SnapshotsDir + timestampStr,
+		File: common.Cfg.BackupSet.SnapshotsDir + "/" + timestampStr,
 		Timestamp: timestamp,
 		Contents: versions,
 	}
